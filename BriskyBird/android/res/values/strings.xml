@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BriskyBird</string>
+
+
+<!-- app_id -->
+
+    <!--
+    Google Play game services IDs.
+    Save this file as res/values/games-ids.xml in your project.
+    -->
+
+        <!-- package_name -->
+        <string name="package_name" translatable="false">com.versionpb.game</string>
+    <string name="leaderboard_easy" translatable="false">CgkIqZPG8KYYEAIQAQ</string>
+    <string name="leaderboard_classic" translatable="false">CgkIqZPG8KYYEAIQBQ</string>
+    <string name="app_id" translatable="false">835070298537</string>
+    </resources>
+

@@ -1,0 +1,78 @@
+For Android Only
+Making on top of
+android:versionCode="11"
+android:versionName="1.7" >
+
+Date : 10th April 2018
+
+1. Bug : high Scre in local phone is saved for both easy and classic mode in variable score and hence
+	score in not updated in classic mode even if it is highs core for classic mode .
+	To fix this : change local variable from score to Easy_HighScore and classic_HighScore
+
+
+ToDo :Little Bug : Score one starts early
+
+This Version is : android:versionCode="12"
+                  android:versionName="1.7" >
+
+1. Even if you dont have google play services , you will be able to play by cancelling the pop up
+2. New link for log in to google Play Services 
+2. In How t PLay State when tapped go back to menu state
+3. On high Score screen a new message that " You wont be able to see Leaderboards until you are logged in to Google Play Services , To Log in go to Menu State "
+4. Another message on High Score Screen , " To Add your high score in Leader Boards first set your google play services profile Public"
+
+
+This Version is : android:versionCode="13"
+                  android:versionName="1.8" >
+
+1. New Bird Image --- Not in this release
+2. Main reason for this build it to move to latest build tools as per google , ap should be at build tools 26 elase will e removed by nov 1 2018
+3. changed background images
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+																Change initiated 16th Nov 2018   - Released 23rd Feb 2019
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Version Before this change
+ android:versionCode="14"
+    android:versionName="1.9"
+
+
+New Version :
+ android:versionCode="15"
+    android:versionName="1.10"
+
+
+                  All States code is now moved to Screens
+                  We are using Asset manager to manage assets
+1.0 Move states to Screen  - Done
+1. Move assests to Assest Manager  - Done
+2. have Loading screen as in MassageVibrator - DOne
+3. Add Version on Menu Screen				- Done
+4. Add Skins and change Menu Screen Buttons with Skins Buttons 	- Done
+5. See if things can be moved to Screens from Stack	-- Everything is Screens , game state manager and stack is all removed
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+																Change Initiated  23rd Feb 2019
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Version Before this change
+ android:versionCode="15"
+    android:versionName="1.10"
+
+
+New Version :
+ android:versionCode="16"
+    android:versionName="1.11"
+
+
+1. Add New Level button names Saga CLicking it should open Menu Screen for Saga
+--Future
+6. Add Interstitial Ads on End Screen Play Button Click
+7. Add continue on Bird dead so we can put reward vedio as there and give a life
+8.Add vibrations on Tap
+9. Add vibration and voice on bird kill
+10. Give life when playing game
+11. Add new Birds
