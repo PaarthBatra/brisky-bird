@@ -22,36 +22,50 @@ import com.versionpb.game.BriskyBird;
 import com.versionpb.game.helpers.GameInfo;
 import com.versionpb.game.helpers.VersionPBAssetManager;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
 
 public class BBMainMenuScreen implements Screen {
 
     public BriskyBird game;
 
-    private Skin skin,skinVPB,skinFreezing;
+    private Skin skin, skinVPB, skinFreezing;
     private Stage stage;
-    private Texture backGroundImage,SignInImage,birdImage;
+    private Texture backGroundImage, SignInImage, birdImage;
     private OrthographicCamera cam;
     private Viewport viewport;
     private BitmapFont font;
 
-    private float Screen_Width,Screen_Height;
-    private float pixelsToScreen_Width_Ratio,pixelsToScreen_Height_Ratio;
+    private float Screen_Width, Screen_Height;
+    private float pixelsToScreen_Width_Ratio, pixelsToScreen_Height_Ratio;
 
     private GlyphLayout glyphLayout_2;
     float w, h;
 
-    private Label label , versionLabel;
+    private Label label, versionLabel;
 
-    private TextButton classicButton,easyButton,sagaButton,highScoresButton,howToPlayButton,signInGooglePlayGamesButton;
-    boolean SignedIn,directionX,directionY;
+    private TextButton classicButton, easyButton, sagaButton, highScoresButton, howToPlayButton,
+            signInGooglePlayGamesButton;
+    boolean SignedIn, directionX, directionY;
 
-    private float birdPosX,birdPosY;
+    private float birdPosX, birdPosY;
+
+    // Animated Frame Bird Members
+    private Animation frameBirdAnimation;
+    private float stateTime;
+    private float frameBirdX, frameBirdY;
+    private boolean frameBirdDirX, frameBirdDirY;
+
+    // Red Animated Bird Members
+    private Animation redBirdAnimation;
+    private float redBirdX, redBirdY;
+    private boolean redBirdDirX, redBirdDirY;
 
     private Music music;
 
     public BBMainMenuScreen(final BriskyBird game) {
         this.game = game;
-
 
         music = game.myassetManager.manager.get(VersionPBAssetManager.MenuMusicFile);
         music.setLooping(true);
@@ -62,31 +76,70 @@ public class BBMainMenuScreen implements Screen {
         directionX = true;
         directionY = true;
 
+        // Initialize Animated Bird
+        Array<TextureRegion> birdFrames = new Array<TextureRegion>();
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame1, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame2, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame3, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame4, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame5, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame6, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame7, Texture.class)));
+        birdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame8, Texture.class)));
+
+        frameBirdAnimation = new Animation(0.1f, birdFrames, Animation.PlayMode.LOOP);
+        stateTime = 0f;
+        frameBirdX = 0; // Start at different position
+        frameBirdY = 200;
+        frameBirdDirX = true;
+        frameBirdDirY = true;
+
+        // Initialize Red Animated Bird
+        Array<TextureRegion> redBirdFrames = new Array<TextureRegion>();
+        redBirdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdRedFrame1, Texture.class)));
+        redBirdFrames.add(
+                new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdRedFrame2, Texture.class)));
+
+        redBirdAnimation = new Animation(0.1f, redBirdFrames, Animation.PlayMode.LOOP);
+        redBirdX = 300; // Start at different position
+        redBirdY = 400;
+        redBirdDirX = false; // Move in opposite direction initially
+        redBirdDirY = true;
+
         Screen_Width = GameInfo.GAME_WIDTH;
         Screen_Height = GameInfo.GAME_HEIGHT;
 
-        pixelsToScreen_Width_Ratio = (float) Gdx.graphics.getWidth() / Screen_Width ;
-        pixelsToScreen_Height_Ratio = (float) Gdx.graphics.getHeight() / Screen_Height ;
+        pixelsToScreen_Width_Ratio = (float) Gdx.graphics.getWidth() / Screen_Width;
+        pixelsToScreen_Height_Ratio = (float) Gdx.graphics.getHeight() / Screen_Height;
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, Screen_Width/2 , Screen_Height/2 );
-        cam.position.set(Screen_Width/2 , Screen_Height/2,0);
+        cam.setToOrtho(false, Screen_Width / 2, Screen_Height / 2);
+        cam.position.set(Screen_Width / 2, Screen_Height / 2, 0);
 
-        float aspectRaio = (float)Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth() ;
-        //viewport = new FillViewport(Screen_Width  , Screen_Height,cam);
-        //viewport = new FitViewport(Screen_Width  , Screen_Height,cam);
-        viewport = new StretchViewport(Screen_Width  , Screen_Height,cam);
-        //viewport = new ExtendViewport(Screen_Width  , Screen_Height,cam);
-        //viewport = new ScreenViewport(cam);
+        float aspectRaio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
+        // viewport = new FillViewport(Screen_Width , Screen_Height,cam);
+        // viewport = new FitViewport(Screen_Width , Screen_Height,cam);
+        viewport = new StretchViewport(Screen_Width, Screen_Height, cam);
+        // viewport = new ExtendViewport(Screen_Width , Screen_Height,cam);
+        // viewport = new ScreenViewport(cam);
         viewport.apply();
 
-        stage = new Stage(viewport,game.getBatch());
+        stage = new Stage(viewport, game.getBatch());
         Gdx.input.setInputProcessor(stage);
 
         backGroundImage = game.myassetManager.manager.get(VersionPBAssetManager.MenuBackground);
         SignInImage = game.myassetManager.manager.get(VersionPBAssetManager.SignInButtonImage);
         birdImage = game.myassetManager.manager.get(VersionPBAssetManager.birdYellowFlapUp);
-        font = game.myassetManager.manager.get(VersionPBAssetManager.MenuFont,BitmapFont.class);
+        font = game.myassetManager.manager.get(VersionPBAssetManager.MenuFont, BitmapFont.class);
         skin = game.myassetManager.manager.get(VersionPBAssetManager.shade_skin);
         skinVPB = game.myassetManager.manager.get(VersionPBAssetManager.vpb_skin);
         skinFreezing = game.myassetManager.manager.get(VersionPBAssetManager.freezing_skin);
@@ -99,18 +152,16 @@ public class BBMainMenuScreen implements Screen {
         Table rootTable = new Table();
         rootTable.setFillParent(true);
 
+        label = new Label("", skin);
+        versionLabel = new Label(GameInfo.appVersion, skin, GameInfo.skin_vpbLabelStyle);
 
-        label = new Label("",skin);
-        versionLabel = new Label(GameInfo.appVersion,skin,GameInfo.skin_vpbLabelStyle);
-
-        classicButton = new TextButton(GameInfo.classicButtonText,skinVPB);
-        easyButton = new TextButton(GameInfo.easyButtonText,skinVPB);
-        sagaButton = new TextButton(GameInfo.sagaButtonText,skinVPB);
+        classicButton = new TextButton(GameInfo.classicButtonText, skinVPB);
+        easyButton = new TextButton(GameInfo.easyButtonText, skinVPB);
+        sagaButton = new TextButton(GameInfo.sagaButtonText, skinVPB);
         highScoresButton = new TextButton(GameInfo.highScoreButtonText, skinFreezing);
         howToPlayButton = new TextButton(GameInfo.howToPlayButtonText, skinFreezing);
 
-        //signInGooglePlayGamesButton = new TextButton("SignIn",skinVPB);
-
+        // signInGooglePlayGamesButton = new TextButton("SignIn",skinVPB);
 
         stage.addActor(rootTable);
         rootTable.top();
@@ -120,36 +171,34 @@ public class BBMainMenuScreen implements Screen {
 
         rootTable.add(label).padBottom(GameInfo.rootTableInvisibleLabelPadBottom);
 
-        //rootTable.row();
-        //rootTable.add(signInGooglePlayGamesButton).width(100).height(20).padRight(-300).padTop(10);
+        // rootTable.row();
+        // rootTable.add(signInGooglePlayGamesButton).width(100).height(20).padRight(-300).padTop(10);
 
         rootTable.row();
         rootTable.add(classicButton).width(250).height(60).padBottom(20).padLeft(GameInfo.allButtonsLeftPadding);
         rootTable.row();
         rootTable.add(easyButton).width(250).height(60).padBottom(140).padLeft(GameInfo.allButtonsLeftPadding);
         rootTable.row();
-        //rootTable.add(sagaButton).width(250).height(60).padBottom(80).padLeft(GameInfo.allButtonsLeftPadding);
-        //rootTable.row();
+        // rootTable.add(sagaButton).width(250).height(60).padBottom(80).padLeft(GameInfo.allButtonsLeftPadding);
+        // rootTable.row();
 
         rootTable.add(highScoresButton).width(250).height(60).padBottom(30).padLeft(GameInfo.allButtonsLeftPadding);
         rootTable.row();
         rootTable.add(howToPlayButton).width(250).height(60).padBottom(20).padLeft(GameInfo.allButtonsLeftPadding);
         rootTable.row();
 
-
-
-        //listeners
+        // listeners
         highScoresButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new HighScoreScreen(game));
-                //dispose();
+                // dispose();
             }
         });
 
         howToPlayButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new HowToPlayScreen(game));
-                //dispose();
+                // dispose();
             }
         });
 
@@ -167,29 +216,27 @@ public class BBMainMenuScreen implements Screen {
             }
         });
 
-        //rootTable.debug();
+        // rootTable.debug();
 
-        if(game.ply.isSignedIn()) {
-            //System.out.println("C:MenuState : F:MenuState Constructor : Already SignedIn Google PlayServices");
+        if (game.ply.isSignedIn()) {
+            // System.out.println("C:MenuState : F:MenuState Constructor : Already SignedIn
+            // Google PlayServices");
             SignedIn = true;
 
-        }
-        else {
+        } else {
             SignedIn = false;
-            //ply.onStartMethod();
-            //ply.signIn();
-            //System.out.println("C:MenuState : F:MenuState Constructor : SignedIn Google PlayServices");
+            // ply.onStartMethod();
+            // ply.signIn();
+            // System.out.println("C:MenuState : F:MenuState Constructor : SignedIn Google
+            // PlayServices");
         }
 
     }
-
 
     @Override
     public void show() {
 
     }
-
-
 
     @Override
     public void render(float delta) {
@@ -198,14 +245,27 @@ public class BBMainMenuScreen implements Screen {
         game.getBatch().setProjectionMatrix(cam.combined);
         game.getBatch().begin();
         game.getBatch().draw(backGroundImage, 0, 0, Screen_Width, Screen_Height);
-        font.draw(game.getBatch(), GameInfo.MenuHeading, Screen_Width/2 - w/2,
+        font.draw(game.getBatch(), GameInfo.MenuHeading, Screen_Width / 2 - w / 2,
                 Screen_Height);
         if (!SignedIn)
-            game.getBatch().draw(SignInImage,  cam.viewportWidth - 80, cam.viewportHeight - 100 , 60 , 60);
+            game.getBatch().draw(SignInImage, cam.viewportWidth - 80, cam.viewportHeight - 100, 60, 60);
 
-        update(delta,directionX,directionY);
+        update(delta, directionX, directionY);
+        updateFrameBird(delta); // Update position for animated bird
 
-        game.getBatch().draw(birdImage, birdPosX,  birdPosY);
+        game.getBatch().draw(birdImage, birdPosX, birdPosY);
+
+        // Draw Animated Bird
+        stateTime += delta;
+        TextureRegion currentFrame = (TextureRegion) frameBirdAnimation.getKeyFrame(stateTime, true);
+        game.getBatch().draw(currentFrame, frameBirdX, frameBirdY, GameInfo.ANIMATED_BIRD_WIDTH,
+                GameInfo.ANIMATED_BIRD_HEIGHT);
+
+        // Draw Red Animated Bird
+        updateRedBird(delta);
+        TextureRegion currentRedFrame = (TextureRegion) redBirdAnimation.getKeyFrame(stateTime, true);
+        game.getBatch().draw(currentRedFrame, redBirdX, redBirdY, GameInfo.RED_BIRD_WIDTH, GameInfo.RED_BIRD_HEIGHT);
+
         game.getBatch().end();
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
@@ -213,7 +273,71 @@ public class BBMainMenuScreen implements Screen {
 
     }
 
-    public void update(float delta, boolean X, boolean Y){
+    public void updateFrameBird(float delta) {
+        if (frameBirdDirX)
+            frameBirdX += GameInfo.ANIMATED_BIRD_SPEED;
+        else
+            frameBirdX -= GameInfo.ANIMATED_BIRD_SPEED;
+
+        if (frameBirdDirY)
+            frameBirdY += GameInfo.ANIMATED_BIRD_SPEED;
+        else
+            frameBirdY -= GameInfo.ANIMATED_BIRD_SPEED;
+
+        if (frameBirdX >= cam.viewportWidth - GameInfo.ANIMATED_BIRD_WIDTH) { // Adjust boundary using width
+            frameBirdX -= GameInfo.ANIMATED_BIRD_SPEED;
+            frameBirdDirX = false;
+        }
+
+        if (frameBirdY >= cam.viewportHeight - GameInfo.ANIMATED_BIRD_HEIGHT) { // Adjust boundary using height
+            frameBirdY -= GameInfo.ANIMATED_BIRD_SPEED;
+            frameBirdDirY = false;
+        }
+
+        if (frameBirdX <= 0) {
+            frameBirdX += GameInfo.ANIMATED_BIRD_SPEED;
+            frameBirdDirX = true;
+        }
+
+        if (frameBirdY <= 0) {
+            frameBirdY += GameInfo.ANIMATED_BIRD_SPEED;
+            frameBirdDirY = true;
+        }
+    }
+
+    public void updateRedBird(float delta) {
+        if (redBirdDirX)
+            redBirdX += GameInfo.RED_BIRD_SPEED;
+        else
+            redBirdX -= GameInfo.RED_BIRD_SPEED;
+
+        if (redBirdDirY)
+            redBirdY += GameInfo.RED_BIRD_SPEED;
+        else
+            redBirdY -= GameInfo.RED_BIRD_SPEED;
+
+        if (redBirdX >= cam.viewportWidth - GameInfo.RED_BIRD_WIDTH) {
+            redBirdX -= GameInfo.RED_BIRD_SPEED;
+            redBirdDirX = false;
+        }
+
+        if (redBirdY >= cam.viewportHeight - GameInfo.RED_BIRD_HEIGHT) {
+            redBirdY -= GameInfo.RED_BIRD_SPEED;
+            redBirdDirY = false;
+        }
+
+        if (redBirdX <= 0) {
+            redBirdX += GameInfo.RED_BIRD_SPEED;
+            redBirdDirX = true;
+        }
+
+        if (redBirdY <= 0) {
+            redBirdY += GameInfo.RED_BIRD_SPEED;
+            redBirdDirY = true;
+        }
+    }
+
+    public void update(float delta, boolean X, boolean Y) {
         if (X)
             birdPosX += 1;
         else
@@ -224,34 +348,27 @@ public class BBMainMenuScreen implements Screen {
         else
             birdPosY -= 1;
 
-        if (birdPosX >= cam.viewportWidth){
+        if (birdPosX >= cam.viewportWidth) {
             birdPosX -= 1;
             directionX = false;
         }
 
-
-        if (birdPosY >= cam.viewportHeight){
+        if (birdPosY >= cam.viewportHeight) {
             birdPosY -= 1;
             directionY = false;
         }
 
-        if (birdPosX <= 0){
+        if (birdPosX <= 0) {
             birdPosX += 1;
             directionX = true;
         }
 
-        if (birdPosY <= 0){
+        if (birdPosY <= 0) {
             birdPosY += 1;
             directionY = true;
         }
 
-
-
     }
-
-
-
-
 
     @Override
     public void resize(int width, int height) {
@@ -276,33 +393,33 @@ public class BBMainMenuScreen implements Screen {
     @Override
     public void dispose() {
 
-        //game.myassetManager.unloadSplashFont();
-        //game.myassetManager.unloadSkin();
-        //game.myassetManager.unloadMenuFont();
-        //game.myassetManager.unloadImages();
+        // game.myassetManager.unloadSplashFont();
+        // game.myassetManager.unloadSkin();
+        // game.myassetManager.unloadMenuFont();
+        // game.myassetManager.unloadImages();
 
         music.stop();
-        //game.myassetManager.unloadMenuMusic();
-        //Gdx.input.setInputProcessor(null);
-        //System.out.println("Menu State Disposed");
+        // game.myassetManager.unloadMenuMusic();
+        // Gdx.input.setInputProcessor(null);
+        // System.out.println("Menu State Disposed");
 
     }
 
-    public void handleInput(float delta){
+    public void handleInput(float delta) {
         if (Gdx.input.isTouched()) {
             Vector3 tmp = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             cam.unproject(tmp);
-            Rectangle textureBoundsSignIn = new Rectangle(cam.viewportWidth - 80, cam.viewportHeight - 100 , 60 , 60);
-            //(SignInImage,  cam.viewportWidth - 80, cam.viewportHeight - 100 , 60 , 60)
+            Rectangle textureBoundsSignIn = new Rectangle(cam.viewportWidth - 80, cam.viewportHeight - 100, 60, 60);
+            // (SignInImage, cam.viewportWidth - 80, cam.viewportHeight - 100 , 60 , 60)
             if (textureBoundsSignIn.contains(tmp.x, tmp.y)) {
 
-                //System.out.println("Clicked on Sign In");
+                // System.out.println("Clicked on Sign In");
                 CallSignIn();
             }
         }
-        }
+    }
 
-    public void CallSignIn(){
+    public void CallSignIn() {
         game.ply.signIn();
         game.ply.onStartMethod();
         SignedIn = true;

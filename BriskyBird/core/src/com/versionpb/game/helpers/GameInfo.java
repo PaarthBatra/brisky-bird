@@ -4,19 +4,18 @@ import com.badlogic.gdx.graphics.Color;
 
 public class GameInfo {
 
-    //Old BriskyBird Related details
+    // Old BriskyBird Related details
     public static final int WIDTH = 480;
     public static final int HEIGHT = 800;
     public static final String TITLE = "Brisky Bird";
     public static final String leaderboard_Easy = "CgkIqZPG8KYYEAIQAQ";
-    public  static final String leaderboard_Classic = "CgkIqZPG8KYYEAIQBQ";
+    public static final String leaderboard_Classic = "CgkIqZPG8KYYEAIQBQ";
 
-
-    //common
+    // common
     public static final String PREFERENCES = "My Preferences";
     public static final String TAP_ON_BIRD_TO_BEGIN = "Tap on Bird to Begin";
 
-    //SplashScreen Screen time
+    // SplashScreen Screen time
     public static final float splashScreen_Milliseconds = 3000;
 
     public static final float Desktop_GAME_WIDTH = 480;
@@ -29,58 +28,65 @@ public class GameInfo {
 
     public static final float Rectangle_Width = 5;
 
-
     public static final String str = "VersionPB";
-    public  static final Color SplashScreenUnderLineColor = Color.WHITE;
+    public static final Color SplashScreenUnderLineColor = Color.WHITE;
 
-    //Loading Bar Screen
+    // Loading Bar Screen
     public static final float labelTopPadding = 200;
     public static final float progressBarXOffset = 100;
     public static final int labelLoadingTopPadding = 200;
-    public static  final String loadingLabelText= "Loading . . .";
-    public static  final String loadingLabelStyleName = "title-plain";
+    public static final String loadingLabelText = "Loading . . .";
+    public static final String loadingLabelStyleName = "title-plain";
 
-    //LoadingClassic Level Srceen
-    public static  final String loadingClassicScreenLabelText= "Loading Classic Level . . .";
+    // LoadingClassic Level Srceen
+    public static final String loadingClassicScreenLabelText = "Loading Classic Level . . .";
 
-    //Loading Easy Level Screeb
-    public static  final String loadingEasyScreenLabelText= "Loading Easy Level . . .";
+    // Loading Easy Level Screeb
+    public static final String loadingEasyScreenLabelText = "Loading Easy Level . . .";
 
-    //Brisky Bird Menu Screen
+    // Brisky Bird Menu Screen
     public static final String MenuHeading = "Brisky Bird \n Main Menu";
-    public static final String appVersion ="Ver 1.10";
+    public static final String appVersion = "Ver 1.11";
     public static final int rootTableInvisibleLabelPadBottom = 200;
     public static final int allButtonsLeftPadding = -100;
     public static final int versionNumberRightPadding = -150;
 
-    public static final String skin_vpbLabelStyle="vpbLabel";
+    // Animated Bird Configuration
+    public static final float ANIMATED_BIRD_WIDTH = 60f;
+    public static final float ANIMATED_BIRD_HEIGHT = 45f;
+    public static final float ANIMATED_BIRD_SPEED = 2.5f;
+
+    // Red Bird Configuration
+    public static final float RED_BIRD_WIDTH = 60f;
+    public static final float RED_BIRD_HEIGHT = 45f;
+    public static final float RED_BIRD_SPEED = 3.5f; // Slightly faster to distinguish
+
+    public static final String skin_vpbLabelStyle = "vpbLabel";
     public static final String classicButtonText = "Classic";
     public static final String easyButtonText = "Easy";
     public static final String sagaButtonText = "Saga";
     public static final String highScoreButtonText = "High Scores";
     public static final String howToPlayButtonText = "How  To Play";
 
-    //High Score Screen
+    // High Score Screen
     public static final String EasyModeHighScores = "Easy Mode";
     public static final String ClassicModeHighScores = "Classic Mode";
     public static final String HIGHSCORES = "High Scores";
-    public static final String PlayServicesSignInMsg = "*You wont be able to see Leaderboards until \nyou are logged in to Google Play Services .\n" +
+    public static final String PlayServicesSignInMsg = "*You wont be able to see Leaderboards until \nyou are logged in to Google Play Services .\n"
+            +
             "To Log in go to Menu State and tap Sign In \n\n**To Add your Name in high score Leader Boards \nSet your google play services profile Public";
 
-    //How To Play Screen
+    // How To Play Screen
     public static final String howToPlayMessage = "Keep Tapping the screen \n to Make the bird fly \n\n\n Make sure the bird never \n        touches \n Pipes or Ground or Sky \n\n\n Tap to Start Enjoying ...";
 
-
-
-    //PlayClassicLevelScreen
+    // PlayClassicLevelScreen
     public static final int CLASSIC_LEVEL_TUBE_SPACING = 125;
     public static final int CLASSIC_LEVEL_TUBE_COUNT = 4;
     public static final int CLASSIC_LEVEL_GROUND_OFFSET = -30;
     public static final String CLASSIC_LEVEL_LevelInfo = "Level : Classic";
     public static final String CLASSIC_LEVEL_HighScore = "ClassicHighScore";
 
-
-    //PlayEasyLevelScreen
+    // PlayEasyLevelScreen
     public static final int EASY_LEVEL_TUBE_SPACING = 255;
     public static final int EASY_LEVEL_TUBE_COUNT = 4;
     public static final int EASY_LEVEL_GROUND_OFFSET = -30;
