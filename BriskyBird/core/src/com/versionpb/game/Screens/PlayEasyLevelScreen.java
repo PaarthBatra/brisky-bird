@@ -209,7 +209,7 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
         game.getBatch().setColor(c);
 
 
-        font_Score.draw(game.getBatch(), Integer.toString(Score), game.getCam().position.x - font_Score.getSpaceWidth(), game.getCam().viewportHeight * 7 / 8);
+        font_Score.draw(game.getBatch(), Integer.toString(Score), game.getCam().position.x - font_Score.getSpaceXadvance(), game.getCam().viewportHeight * 7 / 8);
         font_LevelInfo.draw(game.getBatch(), GameInfo.EASY_LEVEL_LevelInfo, game.getCam().position.x +20  , game.getCam().viewportHeight - 5);
         game.getBatch().draw(ground, groundPos1.x, groundPos1.y);
         game.getBatch().draw(ground, groundPos2.x, groundPos2.y);
@@ -476,6 +476,10 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
         return false;
+    }
+
+    @Override
+    public void pinchStop() {
     }
 }
 

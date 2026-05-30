@@ -1,7 +1,6 @@
 android {
     namespace "com.versionpb.game"
-    buildToolsVersion "23.0.1"
-    compileSdkVersion 26
+    compileSdkVersion 35
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -18,8 +17,8 @@ android {
     }
     defaultConfig {
         applicationId "com.versionpb.game"
-        minSdkVersion 8
-        targetSdkVersion 26
+        minSdkVersion 21
+        targetSdkVersion 35
         multiDexEnabled true
     }
     compileOptions {
@@ -138,7 +137,4 @@ idea {
     }
 }
 */
-
-dependencies {
-    implementation project(path: ':BaseGameUtils')
-}
+

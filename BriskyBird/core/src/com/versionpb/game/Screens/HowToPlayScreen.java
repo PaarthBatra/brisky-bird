@@ -168,6 +168,10 @@ public class HowToPlayScreen implements Screen ,GestureDetector.GestureListener,
     }
 
     @Override
+    public void pinchStop() {
+    }
+
+    @Override
     public boolean keyDown(int keycode) {
         return false;
     }
@@ -203,7 +207,12 @@ public class HowToPlayScreen implements Screen ,GestureDetector.GestureListener,
     }
 
     @Override
-    public boolean scrolled(int amount) {
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
         return false;
     }
 }

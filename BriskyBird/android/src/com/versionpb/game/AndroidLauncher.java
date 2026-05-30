@@ -18,8 +18,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.versionpb.game.BriskyBird;
-import com.google.android.gms.games.Games;
-import com.google.example.games.basegameutils.GameHelper;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.games.PlayGames;
+import com.google.android.gms.games.PlayGamesSdk;
 
 public class AndroidLauncher extends AndroidApplication implements AdHandler,PlayServices {
     private static final String TAG = "AndroidLauncher";
@@ -29,7 +30,7 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
     private final int HIDE_ADS = 0;
     protected AdView adView;
 
-    private GameHelper gameHelper;
+    private boolean mIsSignedIn = false;
 
 
 
@@ -53,19 +54,14 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        gameHelper = new GameHelper(this, GameHelper.CLIENT_GAMES);
-        gameHelper.enableDebugLog(true);
+        PlayGamesSdk.initialize(this);
+        PlayGames.getGamesSignInClient(this).isAuthenticated().addOnCompleteListener(task -> {
+            mIsSignedIn = task.isSuccessful() && task.getResult().isAuthenticated();
+            System.out.println("LBVPB : Silent Sign In result: " + mIsSignedIn);
+        });
 
+        MobileAds.initialize(this, initializationStatus -> {});
 
-        GameHelper.GameHelperListener gameHelperListener = new GameHelper.GameHelperListener() {
-            @Override
-            public void onSignInFailed() {
-            }
-
-            @Override
-            public void onSignInSucceeded() {
-            }
-        };
 
         RelativeLayout layout = new RelativeLayout(this);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
@@ -79,7 +75,7 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
             }
         });
 
-        adView.setAdSize(AdSize.SMART_BANNER);
+        adView.setAdSize(AdSize.BANNER);
         adView.setAdUnitId("ca-app-pub-2542346272130601/7300518177");
 
         AdRequest.Builder builder = new AdRequest.Builder();
@@ -94,8 +90,6 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
 
         setContentView(layout);
 
-        gameHelper.setup(gameHelperListener);
-
     }
 
     @Override
@@ -106,28 +100,24 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
     @Override
     protected void onStart() {
         super.onStart();
-        //gameHelper.onStart(this);
         System.out.println("LBVPB : onStart Method");
     }
 
     @Override
     public void onStartMethod() {
         super.onStart();
-        gameHelper.onStart(this);
         System.out.println("LBVPB : onStart Method");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        gameHelper.onStop();
         System.out.println("LBVPB : onStop Method");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        gameHelper.onActivityResult(requestCode, resultCode, data);
         System.out.println("LBVPB : onActivityResult Method");
     }
 
@@ -138,30 +128,21 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
                 @Override
                 public void run() {
                     System.out.println("LBVPB:Signin In");
-                    gameHelper.beginUserInitiatedSignIn();
-                    System.out.println("LBVPB : signIn Method success");
+                    PlayGames.getGamesSignInClient(AndroidLauncher.this).signIn().addOnCompleteListener(task -> {
+                        mIsSignedIn = task.isSuccessful() && task.getResult().isAuthenticated();
+                        System.out.println("LBVPB : signIn Method result: " + mIsSignedIn);
+                    });
                 }
             });
         } catch (Exception e) {
             System.out.println("LBVPB: ExceptionSignin in Failed");
-            //Gdx.app.log("MainActivity", "Log in failed: " + e.getMessage() + ".");
         }
     }
 
     @Override
     public void signOut() {
-        try {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("LBVPB : SignOut Method ");
-                    gameHelper.signOut();
-                }
-            });
-        } catch (Exception e) {
-            //Gdx.app.log("MainActivity", "Log out failed: " + e.getMessage() + ".");
-            System.out.println("LBVPB : SignOut Exception ");
-        }
+        mIsSignedIn = false;
+        System.out.println("LBVPB : SignOut Method reset locally");
     }
 
     @Override
@@ -173,14 +154,16 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
 
     @Override
     public void unlockAchievement(String str) {
-        Games.Achievements.unlock(gameHelper.getApiClient(), str);
+        if (mIsSignedIn) {
+            PlayGames.getAchievementsClient(this).unlock(str);
+        }
     }
 
     @Override
     public void submitScore(String LeaderBoard,int highScore) {
         if (isSignedIn()) {
             System.out.println("LBVPB : submitScore Start ");
-            Games.Leaderboards.submitScore(gameHelper.getApiClient(), LeaderBoard, highScore);
+            PlayGames.getLeaderboardsClient(this).submitScore(LeaderBoard, highScore);
             System.out.println("LBVPB : submitScoreEasy Succes ");
         }
         else{
@@ -194,14 +177,16 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
     @Override
     public void submitLevel(int highLevel) {
         if (isSignedIn()) {
-            Games.Leaderboards.submitScore(gameHelper.getApiClient(),leaderboard_Easy, highLevel);
+            PlayGames.getLeaderboardsClient(this).submitScore(leaderboard_Easy, highLevel);
         }
     }
 
     @Override
     public void showAchievement() {
         if (isSignedIn()) {
-            startActivityForResult(Games.Achievements.getAchievementsIntent(gameHelper.getApiClient()), 1);
+            PlayGames.getAchievementsClient(this)
+                .getAchievementsIntent()
+                .addOnSuccessListener(intent -> startActivityForResult(intent, 1));
         } else {
             signIn();
         }
@@ -210,7 +195,9 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
     @Override
     public void showScore(String leaderboard_Easy) {
         if (isSignedIn()) {
-            startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), leaderboard_Easy), 1);
+            PlayGames.getLeaderboardsClient(this)
+                .getLeaderboardIntent(leaderboard_Easy)
+                .addOnSuccessListener(intent -> startActivityForResult(intent, 1));
         } else {
             signIn();
         }
@@ -221,7 +208,9 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
     @Override
     public void showLevel() {
         if (isSignedIn()) {
-            startActivityForResult(Games.Leaderboards.getLeaderboardIntent(gameHelper.getApiClient(), String.valueOf(R.string.leaderboard_easy)), 1);
+            PlayGames.getLeaderboardsClient(this)
+                .getLeaderboardIntent(String.valueOf(R.string.leaderboard_easy))
+                .addOnSuccessListener(intent -> startActivityForResult(intent, 1));
         } else {
             signIn();
         }
@@ -229,7 +218,7 @@ public class AndroidLauncher extends AndroidApplication implements AdHandler,Pla
 
     @Override
     public boolean isSignedIn() {
-        return gameHelper.isSignedIn();
+        return mIsSignedIn;
     }
 
 }
