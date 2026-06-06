@@ -3,6 +3,7 @@ package com.versionpb.game.Screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.versionpb.game.BriskyBird;
 import com.versionpb.game.helpers.GameInfo;
 import com.versionpb.game.helpers.VersionPBAssetManager;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.versionpb.game.sprites.Bird;
 import com.versionpb.game.sprites.TubeEasy_Screens;
 
@@ -31,7 +33,9 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
     private Bird bird;
     private Texture playBg, playBg_v1, playBg_v2, playBg_v3, playBg_v4, playBg_v5,playBg_v6,playBg_v7,playBg_v8,playBg_v9,playBg_v10,playBg_v11,playBg_v12,playBg_v13;
     private Texture ground;
-    private Texture pause;
+    private Texture pause, play, mute, unmute;
+    private Music music;
+    private boolean isMuted;
 
     private Vector2 groundPos1;
     private Vector2 groundPos2;
@@ -55,6 +59,12 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
 
     private Viewport viewport;
     private Stage stage;
+    private boolean isDying = false;
+    private float deathTimer = 0f;
+    private float camBaseX;
+    private float camBaseY;
+    private float shakeDuration = 0f;
+    private float shakeIntensity = 0f;
 
     public PlayEasyLevelScreen(final BriskyBird game) {
         this.game = game;
@@ -96,6 +106,13 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
         playBg_v13 = game.myassetManager.manager.get(VersionPBAssetManager.playBg_v13);
         ground = game.myassetManager.manager.get(VersionPBAssetManager.ground);
         pause = game.myassetManager.manager.get(VersionPBAssetManager.pauseImage);
+        pause.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        play = game.myassetManager.manager.get(VersionPBAssetManager.playImage);
+        play.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        mute = game.myassetManager.manager.get(VersionPBAssetManager.muteImage);
+        mute.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        unmute = game.myassetManager.manager.get(VersionPBAssetManager.unmuteImage);
+        unmute.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         die = game.myassetManager.manager.get(VersionPBAssetManager.dieMusicFile);
         point = game.myassetManager.manager.get(VersionPBAssetManager.pointMusicFile);
@@ -105,16 +122,46 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
         font_LevelInfo = game.myassetManager.manager.get(VersionPBAssetManager.fontChillar_LevelInfo);
 
 
-        Texture[] list = {birdFrameImage, birdFrameImage_blue, birdFrameImage_black, birdFrameImage_green,
-                birdFrameImage_lightblue, birdFrameImage_pink};
+        Preferences tempPrefs = Gdx.app.getPreferences(GameInfo.PREFERENCES);
+        isMuted = tempPrefs.getBoolean("isMuted", false);
 
+        music = game.myassetManager.manager.get(VersionPBAssetManager.MenuMusicFile);
+        music.setLooping(true);
+        music.setVolume(isMuted ? 0f : 0.03f);
+        music.play();
 
+        String selectedBird = tempPrefs.getString("SelectedBird", "frame-1");
 
-        Random r = new Random();
-
-        birdFrameImage = list[r.nextInt(list.length)];
-
-        bird = new Bird(50, 300, birdFrameImage , game);
+        if (selectedBird.equals("birdanimation_black")) {
+            bird = new Bird(50, 300, birdFrameImage_black, game);
+        } else if (selectedBird.equals("birdanimation_blue")) {
+            bird = new Bird(50, 300, birdFrameImage_blue, game);
+        } else if (selectedBird.equals("birdanimation_green")) {
+            bird = new Bird(50, 300, birdFrameImage_green, game);
+        } else if (selectedBird.equals("birdanimation_lightblue")) {
+            bird = new Bird(50, 300, birdFrameImage_lightblue, game);
+        } else if (selectedBird.equals("birdanimation_pink")) {
+            bird = new Bird(50, 300, birdFrameImage_pink, game);
+        } else if (selectedBird.equals("birdanimation")) {
+            bird = new Bird(50, 300, birdFrameImage, game);
+        } else if (selectedBird.equals("Redframe-1")) {
+            Array<TextureRegion> frames = new Array<TextureRegion>();
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdRedFrame1, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdRedFrame2, Texture.class)));
+            bird = new Bird(50, 300, frames, game);
+        } else {
+            // Default: "frame-1" (yellow bird)
+            Array<TextureRegion> frames = new Array<TextureRegion>();
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame1, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame2, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame3, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame4, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame5, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame6, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame7, Texture.class)));
+            frames.add(new TextureRegion(game.myassetManager.manager.get(VersionPBAssetManager.birdFrame8, Texture.class)));
+            bird = new Bird(50, 300, frames, game);
+        }
 
 
         Score = 0;
@@ -162,8 +209,20 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
     public void handleInput() {
 
 
-        if (Gdx.input.justTouched())
-            bird.jump();
+        if (Gdx.input.justTouched()) {
+            Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            game.getCam().unproject(touchPos);
+
+            float btnW = 22f;
+            float btnH = 22f;
+            float startX = game.getCam().position.x - 50f;
+            float btnY = groundPos1.y + ground.getHeight() - 20;
+
+            Rectangle buttonsArea = new Rectangle(startX, btnY, 100f, btnH);
+            if (!buttonsArea.contains(touchPos.x, touchPos.y)) {
+                bird.jump(isMuted);
+            }
+        }
     }
 
     @Override
@@ -191,7 +250,7 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
 
         game.getBatch().draw(playBg, game.getCam().position.x - (game.getCam().viewportWidth / 2), 0, GameInfo.WIDTH/2, GameInfo.HEIGHT/2);
 
-        game.getBatch().draw(bird.getTexture(), bird.getPosition().x, bird.getPosition().y);
+        game.getBatch().draw(bird.getTexture(), bird.getPosition().x, bird.getPosition().y, bird.getBounds().getWidth(), bird.getBounds().getHeight());
 
 
         game.getBatch().setColor(RandomR, RandomG, RandomB, 1);
@@ -213,8 +272,16 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
         font_LevelInfo.draw(game.getBatch(), GameInfo.EASY_LEVEL_LevelInfo, game.getCam().position.x +20  , game.getCam().viewportHeight - 5);
         game.getBatch().draw(ground, groundPos1.x, groundPos1.y);
         game.getBatch().draw(ground, groundPos2.x, groundPos2.y);
-        if (BriskyBird.running){
-            game.getBatch().draw(pause,game.getCam().position.x - 80 - pause.getWidth(), pause.getHeight()/2);
+        if (!isDying) {
+            float btnW = 22f;
+            float btnH = 22f;
+            float startX = game.getCam().position.x - 50f;
+            float btnY = groundPos1.y + ground.getHeight() - 20;
+
+            game.getBatch().draw(pause, Math.round(startX), Math.round(btnY), btnW, btnH);
+            game.getBatch().draw(play, Math.round(startX + 26), Math.round(btnY), btnW, btnH);
+            game.getBatch().draw(mute, Math.round(startX + 52), Math.round(btnY), btnW, btnH);
+            game.getBatch().draw(unmute, Math.round(startX + 78), Math.round(btnY), btnW, btnH);
         }
 
         if(!BriskyBird.running ){
@@ -228,40 +295,97 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
 
     }
 
-    public void update(float dt) {
+    private void triggerDeath() {
+        if (isDying) return;
+        isDying = true;
 
-        if (!BriskyBird.running) {
-            Vector3 tmp = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            game.getCam().unproject(tmp);
-            Rectangle textureBounds = new Rectangle(bird.getPosition().x, bird.getPosition().y, bird.getBounds().getWidth(), bird.getBounds().getHeight());
-            if (textureBounds.contains(tmp.x, tmp.y)) {
-                //System.out.println("Bird touched , Running true");
+        die.play(isMuted ? 0f : 0.3f);
+        Gdx.input.vibrate(500);
+        bird.setMOVEMENT(0);
+
+        camBaseX = game.getCam().position.x;
+        camBaseY = game.getCam().position.y;
+        shakeDuration = 0.3f;
+        shakeIntensity = 4f;
+
+        MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
+        if (Score > MaxScore) {
+            prefs.putInteger(GameInfo.EASY_LEVEL_HighScore, Score);
+            prefs.flush();
+            game.ply.submitScore(GameInfo.leaderboard_Easy, Score);
+        }
+    }
+
+    public void update(float dt) {
+        if (isDying) {
+            bird.update(dt);
+            if (shakeDuration > 0) {
+                shakeDuration -= dt;
+                float shakeX = ((float) Math.random() - 0.5f) * 2 * shakeIntensity;
+                float shakeY = ((float) Math.random() - 0.5f) * 2 * shakeIntensity;
+                game.getCam().position.set(camBaseX + shakeX, camBaseY + shakeY, 0);
+            } else {
+                game.getCam().position.set(camBaseX, camBaseY, 0);
+            }
+            if (bird.getPosition().y <= ground.getHeight() + GameInfo.EASY_LEVEL_GROUND_OFFSET) {
+                deathTimer += dt;
+                if (deathTimer >= 0.5f) {
+                    dispose();
+                    game.setScreen(new GameOverScreen(game, Score, prefs.getInteger(GameInfo.EASY_LEVEL_HighScore)));
+                }
+            }
+            game.getCam().update();
+            return;
+        }
+
+        if (Gdx.input.justTouched()) {
+            Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            game.getCam().unproject(touchPos);
+
+            float btnW = 22f;
+            float btnH = 22f;
+            float startX = game.getCam().position.x - 50f;
+            float btnY = groundPos1.y + ground.getHeight() - 20;
+
+            Rectangle pauseBounds = new Rectangle(startX, btnY, btnW, btnH);
+            Rectangle playBounds = new Rectangle(startX + 26, btnY, btnW, btnH);
+            Rectangle muteBounds = new Rectangle(startX + 52, btnY, btnW, btnH);
+            Rectangle unmuteBounds = new Rectangle(startX + 78, btnY, btnW, btnH);
+
+            if (pauseBounds.contains(touchPos.x, touchPos.y)) {
+                BriskyBird.running = false;
+            } else if (playBounds.contains(touchPos.x, touchPos.y)) {
                 BriskyBird.running = true;
+            } else if (muteBounds.contains(touchPos.x, touchPos.y)) {
+                isMuted = true;
+                music.setVolume(0f);
+                prefs.putBoolean("isMuted", true);
+                prefs.flush();
+            } else if (unmuteBounds.contains(touchPos.x, touchPos.y)) {
+                isMuted = false;
+                music.setVolume(0.03f);
+                prefs.putBoolean("isMuted", false);
+                prefs.flush();
+            } else if (!BriskyBird.running) {
+                Rectangle birdBounds = new Rectangle(bird.getPosition().x, bird.getPosition().y, bird.getBounds().getWidth(), bird.getBounds().getHeight());
+                if (birdBounds.contains(touchPos.x, touchPos.y)) {
+                    BriskyBird.running = true;
+                    bird.jump(isMuted);
+                }
             }
         }
+
         if (BriskyBird.running) {
-
-            Vector3 pauseB = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            game.getCam().unproject(pauseB);
-
-            Rectangle textureBoundsPause = new Rectangle(game.getCam().position.x - 80 - pause.getWidth(), pause.getHeight()/2, pause.getWidth(), pause.getHeight());
-            if (textureBoundsPause.contains(pauseB.x, pauseB.y)) {
-                //System.out.println("Pause Button touched , Running true");
-                BriskyBird.running = false;
-
-            }
             updateGround();
             handleInput();
             bird.update(dt);
             game.getCam().position.x = bird.getPosition().x + 80;
 
-            //100 added in tubes gap horizontally
             if (game.getCam().position.x > 400 + 100) {
                 for (TubeEasy_Screens tube : tubes) {
                     if ((game.getCam().position.x - (game.getCam().viewportWidth / 2) + 80 > tube.getPosTopTube().x + (tube.getTopTube().getWidth() / 2)) && !Scored) {
                         posCamScore = game.getCam().position.x;
-                        //System.out.println("Inside Score Loop : posCamScore : Cam Position : " + posCamScore + " : " + game.getCam().position.x + " tube.getPosTopTube().x  : " + tube.getPosTopTube().x + " tube.getTopTube().getWidth() " + tube.getTopTube().getWidth() + " cam.viewportWidth / 2  + " + game.getCam().viewportWidth / 2 + " Score " + Score);
-                        point.play(0.3f);
+                        point.play(isMuted ? 0f : 0.3f);
                         Score++;
                         Scored = true;
                         RandomB = (0 + (int) (Math.random() * 255));
@@ -273,109 +397,36 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
                         if (Score % 5 == 0 && Score > 12) {
                             bird.setMOVEMENT(bird.getMOVEMENT() + 10);
                         }
-
-                        //System.out.println("Score is  : " + Score);
-                        //System.out.println("Movement is : " + bird.getMOVEMENT());
                     }
 
                     if ((game.getCam().position.x > bird.getTexture().getRegionWidth() / 3 + posCamScore + tube.getTopTube().getWidth() + 80) && Scored) {
-                        //System.out.println(" Inside not Score Loop bird.getTexture().getWidth() + posCamScore : Cam Position : " + bird.getTexture().getRegionWidth() / 3 + " : " + posCamScore + ":" + game.getCam().position.x + " tube.getPosTopTube().x  : " + tube.getPosTopTube().x + " tube.getTopTube().getWidth() " + tube.getTopTube().getWidth() + " cam.viewportWidth / 2  + " + game.getCam().viewportWidth / 2 + " Score " + Score);
-
                         Scored = false;
                     }
 
                     if (game.getCam().position.x - (game.getCam().viewportWidth / 2) > tube.getPosTopTube().x + tube.getTopTube().getWidth()) {
                         tube.reposition(tube.getPosTopTube().x + (TubeEasy_Screens.TUBE_WIDTH + GameInfo.EASY_LEVEL_TUBE_SPACING) * GameInfo.EASY_LEVEL_TUBE_COUNT);
                     }
-
-
                 }
 
-
+                // Check tube collisions
                 for (int i = 0; i < GameInfo.EASY_LEVEL_TUBE_COUNT; i++) {
                     if (tubes.get(i).collides(bird.getBounds())) {
-                        die.play(0.3f);
-
-                        MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
-
-                        if (Score > MaxScore) {
-                            prefs.flush();
-                            prefs.putInteger(GameInfo.EASY_LEVEL_HighScore, Score); // Add Maximum Score
-                            prefs.flush();
-                            //System.out.println("New Max. Score Made , Max Score is  : " + prefs.getInteger(GameInfo.EASY_LEVEL_HighScore));
-                            MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
-                            //System.out.println("PlayServices: Setting Score as : " + Score);
-                            game.ply.submitScore(GameInfo.leaderboard_Easy,Score);
-                            //System.out.println("PlayServices: Submitted Score as : " + Score );
-                        }
-                        prefs.flush();
-                        try {
-                            Thread.sleep(2000);
-                        } catch (InterruptedException ex) {
-                            // Thread.currentThread().interrupt();
-                        }
-                        dispose();
-
-                        game.setScreen(new GameOverScreen(game,Score, prefs.getInteger(GameInfo.EASY_LEVEL_HighScore)));
+                        triggerDeath();
+                        return;
                     }
-
-
                 }
             }
-            //bird die in case it touches ground
+
+            // Check ground collision
             if (bird.getPosition().y <= ground.getHeight() + GameInfo.EASY_LEVEL_GROUND_OFFSET) {
-                die.play(0.3f);
-
-                MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
-
-                if (Score > MaxScore) {
-                    prefs.flush();
-                    prefs.putInteger(GameInfo.EASY_LEVEL_HighScore, Score); // Add Maximum Score
-                    prefs.flush();
-                    //System.out.println("New Max. Score Made , Max Score is  : " + prefs.getInteger(GameInfo.EASY_LEVEL_HighScore));
-                    MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
-                    //System.out.println("PlayServices: Setting Score as : " + Score);
-                    game.ply.submitScore(GameInfo.leaderboard_Easy,Score);
-                    //System.out.println("PlayServices: Submitted Score as : " + Score );
-                }
-                prefs.flush();
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    //Thread.currentThread().interrupt();
-                }
-                dispose();
-
-                game.setScreen(new GameOverScreen(game,Score, prefs.getInteger(GameInfo.EASY_LEVEL_HighScore)));
+                triggerDeath();
+                return;
             }
 
-            //bird die in case it touches sky
+            // Check sky collision
             if (bird.getPosition().y >= game.getCam().viewportHeight) {
-                die.play(0.3f);
-
-                MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
-
-                if (Score > MaxScore) {
-                    prefs.flush();
-                    prefs.putInteger(GameInfo.EASY_LEVEL_HighScore, Score); // Add Maximum Score
-                    prefs.flush();
-                    //System.out.println("New Max. Score Made , Max Score is  : " + prefs.getInteger(GameInfo.EASY_LEVEL_HighScore));
-                    MaxScore = prefs.getInteger(GameInfo.EASY_LEVEL_HighScore);
-                    //System.out.println("PlayServices: Setting Score as : " + Score);
-                    game.ply.submitScore(GameInfo.leaderboard_Easy,Score);
-                    //System.out.println("PlayServices: Submitted Score as : " + Score );
-
-                }
-                prefs.flush();
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    //Thread.currentThread().interrupt();
-                }
-                dispose();
-
-                //gsm.set(new GameOver(gsm,ply, Score, prefs.getInteger(GameInfo.EASY_LEVEL_HighScore)));
-                game.setScreen(new GameOverScreen(game,Score, prefs.getInteger(GameInfo.EASY_LEVEL_HighScore)));
+                triggerDeath();
+                return;
             }
 
             game.getCam().update();
@@ -430,6 +481,7 @@ public class PlayEasyLevelScreen implements Screen,GestureDetector.GestureListen
         bird.setMOVEMENT(100);
         bird.dispose();
         stage.dispose();
+        music.stop();
 
 
         for (TubeEasy_Screens tube : tubes) {

@@ -1,6 +1,7 @@
 package com.versionpb.game.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -45,7 +46,7 @@ public class BBMainMenuScreen implements Screen {
 
     private Label label, versionLabel;
 
-    private TextButton classicButton, easyButton, sagaButton, highScoresButton, howToPlayButton,
+    private TextButton classicButton, easyButton, chooseBirdButton, sagaButton, highScoresButton, howToPlayButton,
             signInGooglePlayGamesButton;
     boolean SignedIn, directionX, directionY;
 
@@ -63,14 +64,24 @@ public class BBMainMenuScreen implements Screen {
     private boolean redBirdDirX, redBirdDirY;
 
     private Music music;
+    private Texture muteTexture, unmuteTexture;
+    private boolean isMuted;
+    private Preferences prefs;
 
     public BBMainMenuScreen(final BriskyBird game) {
         this.game = game;
 
         music = game.myassetManager.manager.get(VersionPBAssetManager.MenuMusicFile);
         music.setLooping(true);
-        music.setVolume(0.03f);
+        prefs = Gdx.app.getPreferences(GameInfo.PREFERENCES);
+        isMuted = prefs.getBoolean("isMuted", false);
+        music.setVolume(isMuted ? 0f : 0.03f);
         music.play();
+
+        muteTexture = game.myassetManager.manager.get(VersionPBAssetManager.muteImage);
+        muteTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        unmuteTexture = game.myassetManager.manager.get(VersionPBAssetManager.unmuteImage);
+        unmuteTexture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         game.handler.showAds(true);
         directionX = true;
@@ -157,6 +168,7 @@ public class BBMainMenuScreen implements Screen {
 
         classicButton = new TextButton(GameInfo.classicButtonText, skinVPB);
         easyButton = new TextButton(GameInfo.easyButtonText, skinVPB);
+        chooseBirdButton = new TextButton("Choose Bird", skinVPB);
         sagaButton = new TextButton(GameInfo.sagaButtonText, skinVPB);
         highScoresButton = new TextButton(GameInfo.highScoreButtonText, skinFreezing);
         howToPlayButton = new TextButton(GameInfo.howToPlayButtonText, skinFreezing);
@@ -177,7 +189,9 @@ public class BBMainMenuScreen implements Screen {
         rootTable.row();
         rootTable.add(classicButton).width(250).height(60).padBottom(20).padLeft(GameInfo.allButtonsLeftPadding);
         rootTable.row();
-        rootTable.add(easyButton).width(250).height(60).padBottom(140).padLeft(GameInfo.allButtonsLeftPadding);
+        rootTable.add(easyButton).width(250).height(60).padBottom(20).padLeft(GameInfo.allButtonsLeftPadding);
+        rootTable.row();
+        rootTable.add(chooseBirdButton).width(250).height(60).padBottom(20).padLeft(GameInfo.allButtonsLeftPadding);
         rootTable.row();
         // rootTable.add(sagaButton).width(250).height(60).padBottom(80).padLeft(GameInfo.allButtonsLeftPadding);
         // rootTable.row();
@@ -213,6 +227,12 @@ public class BBMainMenuScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new LoadingBarEasyLevelScreen(game));
                 dispose();
+            }
+        });
+
+        chooseBirdButton.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new ChooseBirdScreen(game));
             }
         });
 
@@ -266,6 +286,16 @@ public class BBMainMenuScreen implements Screen {
         TextureRegion currentRedFrame = (TextureRegion) redBirdAnimation.getKeyFrame(stateTime, true);
         game.getBatch().draw(currentRedFrame, redBirdX, redBirdY, GameInfo.RED_BIRD_WIDTH, GameInfo.RED_BIRD_HEIGHT);
 
+        game.getBatch().end();
+
+        // Draw mute / unmute buttons (bottom-center)
+        float btnSize = 35f;
+        float muteBtnX = cam.viewportWidth / 2f - btnSize - 4;
+        float unmuteBtnX = cam.viewportWidth / 2f + 4;
+        float btnY = 6f;
+        game.getBatch().begin();
+        game.getBatch().draw(muteTexture,   Math.round(muteBtnX),   Math.round(btnY), btnSize, btnSize);
+        game.getBatch().draw(unmuteTexture, Math.round(unmuteBtnX), Math.round(btnY), btnSize, btnSize);
         game.getBatch().end();
 
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
@@ -406,6 +436,31 @@ public class BBMainMenuScreen implements Screen {
     }
 
     public void handleInput(float delta) {
+        // Mute / Unmute button handling
+        if (Gdx.input.justTouched()) {
+            Vector3 muteTouch = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+            cam.unproject(muteTouch);
+            float btnSize = 35f;
+            float muteBtnX = cam.viewportWidth / 2f - btnSize - 4;
+            float unmuteBtnX = cam.viewportWidth / 2f + 4;
+            float btnY = 6f;
+            Rectangle muteBounds   = new Rectangle(muteBtnX,   btnY, btnSize, btnSize);
+            Rectangle unmuteBounds = new Rectangle(unmuteBtnX, btnY, btnSize, btnSize);
+            if (muteBounds.contains(muteTouch.x, muteTouch.y)) {
+                isMuted = true;
+                music.setVolume(0f);
+                prefs.putBoolean("isMuted", true);
+                prefs.flush();
+                return;
+            } else if (unmuteBounds.contains(muteTouch.x, muteTouch.y)) {
+                isMuted = false;
+                music.setVolume(0.03f);
+                prefs.putBoolean("isMuted", false);
+                prefs.flush();
+                return;
+            }
+        }
+        // Sign-in button handling
         if (Gdx.input.isTouched()) {
             Vector3 tmp = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
             cam.unproject(tmp);

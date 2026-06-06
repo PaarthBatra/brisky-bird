@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
@@ -85,6 +86,8 @@ public class LoadingBarScreen implements Screen {
         game.myassetManager.loadhighScoreScreenImages();
         game.myassetManager.loadHowToPlayScreenFonts();
         game.myassetManager.loadHowToPlayScreenImages();
+        // Pre-load fontChillar so it's available on ChooseBirdScreen
+        game.myassetManager.manager.load(VersionPBAssetManager.fontChillar, BitmapFont.class);
 
     }
 

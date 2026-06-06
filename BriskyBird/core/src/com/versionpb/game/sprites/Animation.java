@@ -28,6 +28,13 @@ public class Animation {
         frame = 0;
     }
 
+    public Animation(Array<TextureRegion> framesList, float cycletime) {
+        this.frames = new Array<TextureRegion>(framesList);
+        this.frameCount = framesList.size;
+        this.maxFrameTime = cycletime / frameCount;
+        this.frame = 0;
+    }
+
     public  void update(float dt){
             currentFrameTime += dt;
             if(currentFrameTime > maxFrameTime){

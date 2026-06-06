@@ -54,7 +54,10 @@ public class VersionPBAssetManager {
     public static final String playBg_v12 = "backgrounds/background_play_12.jpg";
     public static final String playBg_v13 = "backgrounds/background_play_13.png";
     public static final String ground = "common/base.png";
-    public static final String pauseImage = "common/pauseButton40.png";
+    public static final String pauseImage = "common/pause.png";
+    public static final String playImage = "common/play.png";
+    public static final String muteImage = "common/mute.png";
+    public static final String unmuteImage = "common/unmute.png";
     public static final String tubeUp = "common/pipe_up.png";
     public static final String tubeDown = "common/pipe_down.png";
 
@@ -155,6 +158,9 @@ public class VersionPBAssetManager {
         manager.load(playBg_v13, Texture.class);
         manager.load(ground, Texture.class);
         manager.load(pauseImage, Texture.class);
+        manager.load(playImage, Texture.class);
+        manager.load(muteImage, Texture.class);
+        manager.load(unmuteImage, Texture.class);
         manager.load(tubeDown, Texture.class);
         manager.load(tubeUp, Texture.class);
 
@@ -183,6 +189,9 @@ public class VersionPBAssetManager {
         manager.unload(playBg_v13);
         manager.unload(ground);
         manager.unload(pauseImage);
+        manager.unload(playImage);
+        manager.unload(muteImage);
+        manager.unload(unmuteImage);
         manager.unload(tubeDown);
         manager.unload(tubeUp);
 
@@ -211,6 +220,9 @@ public class VersionPBAssetManager {
         manager.load(playBg_v13, Texture.class);
         manager.load(ground, Texture.class);
         manager.load(pauseImage, Texture.class);
+        manager.load(playImage, Texture.class);
+        manager.load(muteImage, Texture.class);
+        manager.load(unmuteImage, Texture.class);
         manager.load(tubeDown, Texture.class);
         manager.load(tubeUp, Texture.class);
 
@@ -239,6 +251,9 @@ public class VersionPBAssetManager {
         manager.unload(playBg_v13);
         manager.unload(ground);
         manager.unload(pauseImage);
+        manager.unload(playImage);
+        manager.unload(muteImage);
+        manager.unload(unmuteImage);
         manager.unload(tubeDown);
         manager.unload(tubeUp);
 
@@ -402,6 +417,14 @@ public class VersionPBAssetManager {
         manager.load(birdFrame8, Texture.class);
         manager.load(birdRedFrame1, Texture.class);
         manager.load(birdRedFrame2, Texture.class);
+        manager.load(birdFrameImage_blue, Texture.class);
+        manager.load(birdFrameImage_green, Texture.class);
+        manager.load(birdFrameImage_black, Texture.class);
+        manager.load(birdFrameImage, Texture.class);
+        manager.load(birdFrameImage_lightblue, Texture.class);
+        manager.load(birdFrameImage_pink, Texture.class);
+        manager.load(muteImage, Texture.class);
+        manager.load(unmuteImage, Texture.class);
 
     }
 
@@ -420,6 +443,14 @@ public class VersionPBAssetManager {
         manager.unload(birdFrame8);
         manager.unload(birdRedFrame1);
         manager.unload(birdRedFrame2);
+        manager.unload(birdFrameImage_blue);
+        manager.unload(birdFrameImage_green);
+        manager.unload(birdFrameImage_black);
+        manager.unload(birdFrameImage);
+        manager.unload(birdFrameImage_lightblue);
+        manager.unload(birdFrameImage_pink);
+        manager.unload(muteImage);
+        manager.unload(unmuteImage);
 
     }
 

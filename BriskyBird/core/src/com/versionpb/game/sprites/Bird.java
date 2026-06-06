@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.versionpb.game.BriskyBird;
 import com.versionpb.game.helpers.VersionPBAssetManager;
+import com.badlogic.gdx.utils.Array;
 
 
 /**
@@ -48,6 +49,17 @@ public class Bird {
         flap = game.myassetManager.manager.get(VersionPBAssetManager.wingMusicFile);
     }
 
+    public Bird(int x, int y, Array<TextureRegion> frames, BriskyBird game) {
+        position = new Vector3(x, y, 0);
+        velocity = new Vector3(0, 0, 0);
+        birdAnimation = new Animation(frames, 0.3f);
+        Texture defaultTex = game.myassetManager.manager.get(VersionPBAssetManager.birdFrameImage, Texture.class);
+        float defaultW = defaultTex.getWidth() / 3f;
+        float defaultH = defaultTex.getHeight();
+        bounds = new Rectangle(x, y, defaultW, defaultH);
+        flap = game.myassetManager.manager.get(VersionPBAssetManager.wingMusicFile);
+    }
+
     public void update(float dt){
 
         birdAnimation.update(dt);
@@ -72,9 +84,9 @@ public class Bird {
         return birdAnimation.getFrame();
     }
 
-    public void jump(){
+    public void jump(boolean isMuted){
         velocity.y = 250;
-        flap.play(0.3f);
+        flap.play(isMuted ? 0f : 0.3f);
     }
 
     public Rectangle getBounds(){

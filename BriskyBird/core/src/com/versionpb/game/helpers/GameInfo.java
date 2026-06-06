@@ -46,7 +46,7 @@ public class GameInfo {
 
     // Brisky Bird Menu Screen
     public static final String MenuHeading = "Brisky Bird \n Main Menu";
-    public static final String appVersion = "Ver 1.11";
+    public static final String appVersion = "Ver 1.12";
     public static final int rootTableInvisibleLabelPadBottom = 200;
     public static final int allButtonsLeftPadding = -100;
     public static final int versionNumberRightPadding = -150;
