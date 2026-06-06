@@ -140,4 +140,8 @@ gradlew android:assembleRelease
 - Portrait orientation is locked in the app
 - First launch may take longer due to asset loading
 
+## Version History
+
+See the [VERSION_HISTORY.md](../VERSION_HISTORY.md) file for a detailed log of updates and changes made to the project.
+
 Enjoy playing BriskyBird! 🐦

@@ -29,7 +29,7 @@ To build and run this project, you will need:
 
 ## Running the App
 
-For detailed instructions on how to build, install, and run the app on an actual Android device, please refer to the [README_RUN_ON_MOBILE.md](README_RUN_ON_MOBILE.md) guide.
+For detailed instructions on how to build, install, and run the app on an actual Android device, please refer to the [README_RUN_ON_MOBILE.md](BriskyBird/README_RUN_ON_MOBILE.md) guide.
 
 ### Quick Start (Command Line)
 
